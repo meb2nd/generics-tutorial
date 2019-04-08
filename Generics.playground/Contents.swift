@@ -40,7 +40,7 @@ let optionalName = Optional<String>.some("Princess Moana")
 if let name = optionalName {}
 
 
-struct Queue<Element: Comparable> {
+struct Queue<Element: Equatable> {
     fileprivate var elements: [Element] = []
     
     mutating func enqueue(newElement: Element) {
@@ -106,12 +106,8 @@ q.peek() // 5
 
 extension Queue {
     func isHomogeneous() -> Bool {
-        for (index, element) in elements.enumerated() {
-            if elements.indices.contains(index+1) {
-                if element != elements[index + 1] {return false}
-            }
-        }
-        return true
+        guard let first = elements.first else { return true }
+        return !elements.contains { $0 != first }
     }
 }
 
@@ -128,4 +124,63 @@ q2.enqueue(newElement: 2)
 q2.isHomogeneous() //True
 q2.enqueue(newElement: 4)
 q2.isHomogeneous() //False
+
+class Box<T> {
+    // Just a plain old box.
+}
+
+class Gift<T>: Box<T> {
+    // By default, a gift box is wrapped with plain white paper
+    func wrap() {
+        print("Wrap with plain white paper.")
+    }
+}
+
+class Rose {
+    // Flower of choice for fairytale dramas
+}
+
+class ValentinesBox: Gift<Rose> {
+    // A rose for your valentine
+    override func wrap() {
+        print("Wrap with ♥♥♥ paper.")
+    }
+}
+
+class Shoe {
+    // Just regular footwear
+}
+
+class GlassSlipper: Shoe {
+    // A single shoe, destined for a princess
+}
+
+class ShoeBox: Box<Shoe> {
+    // A box that can contain shoes
+}
+
+let box = Box<Rose>() // A regular box that can contain a rose
+let gift = Gift<Rose>() // A gift box that can contain a rose
+let shoeBox = ShoeBox()
+let valentines = ValentinesBox()
+gift.wrap() // plain white paper
+valentines.wrap() // ♥♥♥ paper
+
+enum Result<Value> {
+    case success(Value), failure(Error)
+}
+
+enum MathError: Error {
+    case divisionByZero
+}
+
+func divide(_ x: Int, by y: Int) -> Result<Int> {
+    guard y != 0 else {
+        return .failure(MathError.divisionByZero)
+    }
+    return .success(x / y)
+}
+
+let result1 = divide(42, by: 2) // .success(21)
+let result2 = divide(42, by: 0) // .failure(MathError.divisionByZero)
 
